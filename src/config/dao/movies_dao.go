@@ -13,12 +13,6 @@ type MoviesDAO struct {
 	Database string
 }
 
-var db *mgo.Database
-
-const (
-	COLLECTION = "movies"
-)
-
 func (m *MoviesDAO) Connect() {
 	session, err := mgo.Dial(m.Server)
 	if err != nil {

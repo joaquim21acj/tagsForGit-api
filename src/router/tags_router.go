@@ -4,13 +4,11 @@ import (
 	"encoding/json"
 	"net/http"
 
-	. "../config/dao"
-	. "../models"
 	"github.com/gorilla/mux"
 	"gopkg.in/mgo.v2/bson"
 )
 
-var dao = MoviesDAO{}
+var dao = Tag{}
 
 func respondWithError(w http.ResponseWriter, code int, msg string) {
 	respondWithJson(w, code, map[string]string{"error": msg})
@@ -44,7 +42,7 @@ func GetByID(w http.ResponseWriter, r *http.Request) {
 
 func Create(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	var movie Movie
+	var tags models.Tags
 	if err := json.NewDecoder(r.Body).Decode(&movie); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
@@ -55,29 +53,4 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	respondWithJson(w, http.StatusCreated, movie)
-}
-
-func Update(w http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
-	params := mux.Vars(r)
-	var movie Movie
-	if err := json.NewDecoder(r.Body).Decode(&movie); err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
-		return
-	}
-	if err := dao.Update(params["id"], movie); err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-	respondWithJson(w, http.StatusOK, map[string]string{"result": movie.Name + " atualizado com sucesso!"})
-}
-
-func Delete(w http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
-	params := mux.Vars(r)
-	if err := dao.Delete(params["id"]); err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
 }
