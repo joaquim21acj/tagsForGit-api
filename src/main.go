@@ -6,9 +6,11 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	. "github.com/joaquim/go-restapi/src/config"
-	. "github.com/joaquim/go-restapi/src/config/dao"
-	movierouter "github.com/joaquim/go-restapi/src/router"
+	.  "./config"
+	. "./config/dao"
+	//. "github.com/joaquim/go/tagsForGit-api/src/config"
+	//. "github.com/joaquim/go/tagsForGit-api/src/config/dao"
+	movierouter "./router"
 )
 
 var dao = MoviesDAO{}
