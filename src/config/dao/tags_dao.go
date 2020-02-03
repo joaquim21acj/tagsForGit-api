@@ -27,19 +27,19 @@ func (m *TagsDAO) Connect() {
 	db = session.DB(m.Database)
 }
 
-func (m *TagsDAO) GetAll() ([]Tags, error) {
+func (m *TagsDAO) GetAllTags() ([]Tags, error) {
 	var tags []Tags
 	err := db.C(COLLECTION).Find(bson.M{}).All(&tags)
 	return tags, err
 }
 
-func (m *TagsDAO) GetByID(id string) (Tags, error) {
+func (m *TagsDAO) GetTagsByID(id string) (Tags, error) {
 	var tags Tags
 	err := db.C(COLLECTION).FindId(bson.ObjectIdHex(id)).One(&tags)
 	return tags, err
 }
 
-func (m *TagsDAO) Create(tags Tags) error {
+func (m *TagsDAO) CreateTags(tags Tags) error {
 	err := db.C(COLLECTION).Insert(&tags)
 	return err
 }

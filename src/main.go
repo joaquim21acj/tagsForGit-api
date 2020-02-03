@@ -31,9 +31,9 @@ func main() {
 	r.HandleFunc("/api/v1/movies/{id}", router.Update).Methods("PUT")
 	r.HandleFunc("/api/v1/movies/{id}", router.Delete).Methods("DELETE")
 
-	r.HandleFunc("/api/v1/tags", router.GetAll).Methods("GET")
-	r.HandleFunc("/api/v1/tags/{id}", router.GetByID).Methods("GET")
-	r.HandleFunc("/api/v1/tags", router.Create).Methods("POST")
+	r.HandleFunc("/api/v1/tags", router.GetAllTags).Methods("GET")
+	r.HandleFunc("/api/v1/tags/{id}", router.GetTagByID).Methods("GET")
+	r.HandleFunc("/api/v1/tags", router.CreateTag).Methods("POST")
 
 	var port = ":3000"
 	fmt.Println("Server running in port:", port)
