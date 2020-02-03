@@ -4,11 +4,13 @@ import (
 	"encoding/json"
 	"net/http"
 
+	. "../config/dao"
+	. "../models"
 	"github.com/gorilla/mux"
 	"gopkg.in/mgo.v2/bson"
 )
 
-var dao = Tag{}
+var daoTags = TagsDAO{}
 
 func respondWithError(w http.ResponseWriter, code int, msg string) {
 	respondWithJson(w, code, map[string]string{"error": msg})
@@ -21,8 +23,8 @@ func respondWithJson(w http.ResponseWriter, code int, payload interface{}) {
 	w.Write(response)
 }
 
-func GetAll(w http.ResponseWriter, r *http.Request) {
-	movies, err := dao.GetAll()
+func GetAllTags(w http.ResponseWriter, r *http.Request) {
+	movies, err := daoTags.GetAll()
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -30,9 +32,9 @@ func GetAll(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusOK, movies)
 }
 
-func GetByID(w http.ResponseWriter, r *http.Request) {
+func GetTagByID(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	movie, err := dao.GetByID(params["id"])
+	movie, err := daoTags.GetByID(params["id"])
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid Movie ID")
 		return
@@ -40,17 +42,17 @@ func GetByID(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusOK, movie)
 }
 
-func Create(w http.ResponseWriter, r *http.Request) {
+func CreateTag(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	var tags models.Tags
-	if err := json.NewDecoder(r.Body).Decode(&movie); err != nil {
+	var tags Tags
+	if err := json.NewDecoder(r.Body).Decode(&tags); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
-	movie.ID = bson.NewObjectId()
-	if err := dao.Create(movie); err != nil {
+	tags.ID = bson.NewObjectId()
+	if err := daoTags.Create(tags); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	respondWithJson(w, http.StatusCreated, movie)
+	respondWithJson(w, http.StatusCreated, tags)
 }

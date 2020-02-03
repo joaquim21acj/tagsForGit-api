@@ -38,3 +38,8 @@ func (m *TagsDAO) GetByID(id string) (Tags, error) {
 	err := db.C(COLLECTION).FindId(bson.ObjectIdHex(id)).One(&tags)
 	return tags, err
 }
+
+func (m *TagsDAO) Create(tags Tags) error {
+	err := db.C(COLLECTION).Insert(&tags)
+	return err
+}

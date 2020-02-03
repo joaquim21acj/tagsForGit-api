@@ -5,12 +5,11 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gorilla/mux"
-	.  "./config"
+	router "./router"
+
+	. "./config"
 	. "./config/dao"
-	//. "github.com/joaquim/go/tagsForGit-api/src/config"
-	//. "github.com/joaquim/go/tagsForGit-api/src/config/dao"
-	movierouter "./router"
+	"github.com/gorilla/mux"
 )
 
 var dao = MoviesDAO{}
@@ -26,11 +25,15 @@ func init() {
 
 func main() {
 	r := mux.NewRouter()
-	r.HandleFunc("/api/v1/movies", movierouter.GetAll).Methods("GET")
-	r.HandleFunc("/api/v1/movies/{id}", movierouter.GetByID).Methods("GET")
-	r.HandleFunc("/api/v1/movies", movierouter.Create).Methods("POST")
-	r.HandleFunc("/api/v1/movies/{id}", movierouter.Update).Methods("PUT")
-	r.HandleFunc("/api/v1/movies/{id}", movierouter.Delete).Methods("DELETE")
+	r.HandleFunc("/api/v1/movies", router.GetAll).Methods("GET")
+	r.HandleFunc("/api/v1/movies/{id}", router.GetByID).Methods("GET")
+	r.HandleFunc("/api/v1/movies", router.Create).Methods("POST")
+	r.HandleFunc("/api/v1/movies/{id}", router.Update).Methods("PUT")
+	r.HandleFunc("/api/v1/movies/{id}", router.Delete).Methods("DELETE")
+
+	r.HandleFunc("/api/v1/tags", router.GetAll).Methods("GET")
+	r.HandleFunc("/api/v1/tags/{id}", router.GetByID).Methods("GET")
+	r.HandleFunc("/api/v1/tags", router.Create).Methods("POST")
 
 	var port = ":3000"
 	fmt.Println("Server running in port:", port)
