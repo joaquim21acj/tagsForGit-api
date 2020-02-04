@@ -29,8 +29,7 @@ func respondWithJson(w http.ResponseWriter, code int, payload interface{}) {
 }
 
 func GetAllTags(w http.ResponseWriter, r *http.Request) {
-
-	urlQuery, err = url.Parse(r.URL.Path)
+	urlQuery, err := url.Parse(r.URL.Path)
 	if (err != nil) || (urlQuery.Query["userLogin"] == nil) {
 		respondWithError(w, http.StatusBadRequest, err.Error())
 	}
