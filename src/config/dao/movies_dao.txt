@@ -3,7 +3,8 @@ package dao
 import (
 	"log"
 
-	. "../../models"
+	"tagsForGit-api/src/models"
+
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -21,19 +22,19 @@ func (m *MoviesDAO) Connect() {
 	db = session.DB(m.Database)
 }
 
-func (m *MoviesDAO) GetAll() ([]Movie, error) {
-	var movies []Movie
+func (m *MoviesDAO) GetAll() ([]models.Movie, error) {
+	var movies []models.Movie
 	err := db.C(COLLECTION).Find(bson.M{}).All(&movies)
 	return movies, err
 }
 
-func (m *MoviesDAO) GetByID(id string) (Movie, error) {
-	var movie Movie
+func (m *MoviesDAO) GetByID(id string) (models.Movie, error) {
+	var movie models.Movie
 	err := db.C(COLLECTION).FindId(bson.ObjectIdHex(id)).One(&movie)
 	return movie, err
 }
 
-func (m *MoviesDAO) Create(movie Movie) error {
+func (m *MoviesDAO) Create(movie models.Movie) error {
 	err := db.C(COLLECTION).Insert(&movie)
 	return err
 }

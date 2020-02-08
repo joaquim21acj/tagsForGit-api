@@ -1,7 +1,7 @@
 package models
 
-func getRepositories(userLogin string) string {
-	var query = `
+func GetRepositories(userLogin string) string {
+	var query = `query:
 				{
 					user(login: "` + userLogin + `") {
 					id

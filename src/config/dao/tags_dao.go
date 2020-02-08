@@ -2,8 +2,8 @@ package dao
 
 import (
 	"log"
+	"tagsForGit-api/src/models"
 
-	. "../../models"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -27,19 +27,19 @@ func (m *TagsDAO) Connect() {
 	db = session.DB(m.Database)
 }
 
-func (m *TagsDAO) GetAllTags() ([]Tags, error) {
-	var tags []Tags
+func (m *TagsDAO) GetAllTags() ([]models.Tags, error) {
+	var tags []models.Tags
 	err := db.C(COLLECTION).Find(bson.M{}).All(&tags)
 	return tags, err
 }
 
-func (m *TagsDAO) GetTagsByID(id string) (Tags, error) {
-	var tags Tags
+func (m *TagsDAO) GetTagsByID(id string) (models.Tags, error) {
+	var tags models.Tags
 	err := db.C(COLLECTION).FindId(bson.ObjectIdHex(id)).One(&tags)
 	return tags, err
 }
 
-func (m *TagsDAO) CreateTags(tags Tags) error {
+func (m *TagsDAO) CreateTags(tags models.Tags) error {
 	err := db.C(COLLECTION).Insert(&tags)
 	return err
 }
