@@ -1,7 +1,7 @@
 package models
 
 func GetRepositories(userLogin string) string {
-	var query = `	{
+	var query = `	query {
 					user(login: "` + userLogin + `") {
 					id
 					starredRepositories(first: 10) {

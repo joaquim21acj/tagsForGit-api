@@ -9,13 +9,12 @@ import (
 	"tagsForGit-api/src/config/dao"
 	"tagsForGit-api/src/models"
 
-	"github.com/friendsofgo/graphiql"
 	"github.com/gorilla/mux"
 )
 
 var daoTags = dao.TagsDAO{}
 var urlGraphQL = "https://api.github.com/graphql"
-var token = "d8193fb19afe1daf8fd0d6443614bdc2d2d2a027"
+var token = "c210bd6cd82948ce7b1830bc84de3c495801a8fa"
 
 func respondWithError(w http.ResponseWriter, code int, msg string) {
 	respondWithJson(w, code, map[string]string{"error": msg})
@@ -37,10 +36,22 @@ func GetAllTags(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Realiza o processo de converter a string para o formato do graphql
-	var grql = graphiql.Handler{}
-	log.Println(grql.ServeHTTPMustParseSchema(s, &models.GetRepositories(userLogin)))
+
 	client := &http.Client{}
-	req, _ := http.NewRequest("POST", urlGraphQL, bytes.NewBufferString(models.GetRepositories(userLogin[0])))
+	var queryString = models.GetRepositories(userLogin[0])
+
+	requestBodyObj := struct {
+		Query string `json:"query"`
+	}{
+		Query: queryString}
+	var requestBody bytes.Buffer
+	if err := json.NewEncoder(&requestBody).Encode(requestBodyObj); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	//var queryBytes = bytes.NewBufferString(queryString)
+	req, _ := http.NewRequest("POST", urlGraphQL, &requestBody)
 	req.Header.Set("Authorization", "Bearer "+token)
 	log.Println(req.Body)
 	res, err := client.Do(req)
