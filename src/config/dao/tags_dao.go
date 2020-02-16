@@ -27,8 +27,8 @@ func (m *TagsDAO) Connect() {
 	db = session.DB(m.Database)
 }
 
-func (m *TagsDAO) GetAllTags() ([]models.Tags, error) {
-	var tags []models.Tags
+func (m *TagsDAO) GetAllTags() ([]models.GitRepositories, error) {
+	var tags []models.GitRepositories
 	err := db.C(COLLECTION).Find(bson.M{}).All(&tags)
 	return tags, err
 }
@@ -39,7 +39,7 @@ func (m *TagsDAO) GetTagsByID(id string) (models.Tags, error) {
 	return tags, err
 }
 
-func (m *TagsDAO) CreateTags(tags models.Tags) error {
+func (m *TagsDAO) CreateTags(tags interface{}) error {
 	err := db.C(COLLECTION).Insert(&tags)
 	return err
 }

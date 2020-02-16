@@ -21,7 +21,7 @@ type graphResponse struct {
 }
 
 var urlGraphQL = "https://api.github.com/graphql"
-var token = "14556d98644a4a02fe68d9325cc914020f7a4602"
+var token = "b09fbd6e6694e927b0293c0ed227e284f39a018b"
 
 func respondWithError(w http.ResponseWriter, code int, msg string) {
 	respondWithJson(w, code, map[string]string{"error": msg})
@@ -32,6 +32,15 @@ func respondWithJson(w http.ResponseWriter, code int, payload interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	w.Write(response)
+}
+
+func GetTagAllTest(w http.ResponseWriter, r *http.Request) {
+	tags, err := daoTags.GetAllTags()
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid Movie ID")
+		return
+	}
+	respondWithJson(w, http.StatusOK, tags)
 }
 
 func GetAllTags(w http.ResponseWriter, r *http.Request) {
@@ -61,7 +70,6 @@ func GetAllTags(w http.ResponseWriter, r *http.Request) {
 	client := &http.Client{}
 	req, _ := http.NewRequest("POST", urlGraphQL, &requestBody)
 	req.Header.Set("Authorization", "Bearer "+token)
-	log.Println(req.Body)
 	res, err := client.Do(req)
 	//fim da requisição
 	if err != nil {
@@ -74,16 +82,23 @@ func GetAllTags(w http.ResponseWriter, r *http.Request) {
 		log.Println(errors.Wrap(err, "reading body"))
 		return
 	}
+	//definição da variável com o formato dos dados recebidos
 	gr := &graphResponse{
-		Data: models.Tags{},
+		Data: models.GitRepositories{},
 	}
-
+	//Transforma os dados de bytes, em buffer, para o formato da struct criada
 	if err := json.NewDecoder(&buf).Decode(&gr); err != nil {
 		if res.StatusCode != http.StatusOK {
 			log.Println(fmt.Errorf("graphql: server returned a non-200 status code: %v", res.StatusCode))
 		}
 		log.Println(errors.Wrap(err, "decoding response"))
 	}
+
+	if err := daoTags.CreateTags(gr.Data); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	respondWithJson(w, http.StatusCreated, gr.Data)
 	// if err != nil {
 	// 	respondWithError(w, http.StatusInternalServerError, err.Error())
 	// 	return
@@ -101,7 +116,6 @@ func GetAllTags(w http.ResponseWriter, r *http.Request) {
 
 	// b, _ := ioutil.ReadAll(res.Body)
 	// log.Fatal(string(b))
-	respondWithJson(w, 200, gr)
 	// body, err := ioutil.ReadAll(res.Body)gr
 	// if err != nil {
 	// 	respondWithError(w, http.StatusInternalServerError, err.Error())

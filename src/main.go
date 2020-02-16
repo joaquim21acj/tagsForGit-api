@@ -33,7 +33,8 @@ func main() {
 	r.HandleFunc("/api/v1/tags", router.GetAllTags).Methods("GET")
 	r.HandleFunc("/api/v1/tags/{id}", router.GetTagByID).Methods("GET")
 	r.HandleFunc("/api/v1/tags", router.CreateTag).Methods("POST")
-
+	// Função apenas para testar dados do banco
+	r.HandleFunc("/api/v1/test", router.GetTagAllTest).Methods("GET")
 	var port = ":3000"
 	fmt.Println("Server running in port:", port)
 	log.Fatal(http.ListenAndServe(port, r))
