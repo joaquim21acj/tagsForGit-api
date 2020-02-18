@@ -4,6 +4,7 @@ func GetRepositories(userLogin string) string {
 	var query = `	query {
 					user(login: "` + userLogin + `") {
 					id
+					login
 					starredRepositories(first: 10) {
 						edges {
 						node {

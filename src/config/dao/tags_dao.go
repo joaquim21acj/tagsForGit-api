@@ -30,6 +30,13 @@ func (m *TagsDAO) Connect() {
 func (m *TagsDAO) GetAllTags() ([]models.GitRepositories, error) {
 	var tags []models.GitRepositories
 	err := db.C(COLLECTION).Find(bson.M{}).All(&tags)
+	// err := db.C(COLLECTION).Find(bson.M{}).All(&tags)
+	return tags, err
+}
+
+func (m *TagsDAO) GetTagsByUser(login string) (models.GitRepositories, error) {
+	var tags models.Tags
+	err := db.C(COLLECTION).FindId(bson.M{"user.login": login}).One(&tags)
 	return tags, err
 }
 
@@ -40,6 +47,6 @@ func (m *TagsDAO) GetTagsByID(id string) (models.Tags, error) {
 }
 
 func (m *TagsDAO) CreateTags(tags interface{}) error {
-	err := db.C(COLLECTION).Insert(&tags)
+	err := db.C(COLLECTION).Insert(tags)
 	return err
 }

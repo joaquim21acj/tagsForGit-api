@@ -21,7 +21,7 @@ type graphResponse struct {
 }
 
 var urlGraphQL = "https://api.github.com/graphql"
-var token = "b09fbd6e6694e927b0293c0ed227e284f39a018b"
+var token = "bb9051f211e5178b953fbf566274ba3b57afc142"
 
 func respondWithError(w http.ResponseWriter, code int, msg string) {
 	respondWithJson(w, code, map[string]string{"error": msg})
@@ -36,6 +36,7 @@ func respondWithJson(w http.ResponseWriter, code int, payload interface{}) {
 
 func GetTagAllTest(w http.ResponseWriter, r *http.Request) {
 	tags, err := daoTags.GetAllTags()
+	log.Println(tags)
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid Movie ID")
 		return
@@ -94,40 +95,17 @@ func GetAllTags(w http.ResponseWriter, r *http.Request) {
 		log.Println(errors.Wrap(err, "decoding response"))
 	}
 
+	tag, err := daoTags.GetTagsByUser(userLogin[0])
+	if err {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
 	if err := daoTags.CreateTags(gr.Data); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 	respondWithJson(w, http.StatusCreated, gr.Data)
-	// if err != nil {
-	// 	respondWithError(w, http.StatusInternalServerError, err.Error())
-	// 	return
-	// }
-	// log.Println(res.StatusCode)
-	// if res.StatusCode == 200 {
-	// 	log.Println(res.Body)
-	// 	var tags = getJson(res, models.Tags{})
-	// 	// var tags []models.Tags
-	// 	// tags = daoTags.GetAllTags()
-	// 	respondWithJson(w, 200, tags)
-	// 	log.Println("Url Param 'userLogin' is here")
-	// 	return
-	// }
 
-	// b, _ := ioutil.ReadAll(res.Body)
-	// log.Fatal(string(b))
-	// body, err := ioutil.ReadAll(res.Body)gr
-	// if err != nil {
-	// 	respondWithError(w, http.StatusInternalServerError, err.Error())
-	// }
-	// log.Println(string(body))
-
-	// tags, err := daoTags.GetAllTags()
-	// if err != nil {
-	// 	respondWithError(w, http.StatusInternalServerError, err.Error())
-	// 	return
-	// }
-	// respondWithJson(w, http.StatusOK, tags)
 }
 
 func GetTagByID(w http.ResponseWriter, r *http.Request) {

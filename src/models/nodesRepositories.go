@@ -12,5 +12,5 @@ type Node struct {
 	} `json:"languages"`
 	Name        string `json:"name"`
 	ProjectsURL string `json:"projectsUrl"`
-	tags        []Tags `json:"tags"`
+	Tags        []Tags `json:"tags"`
 }
