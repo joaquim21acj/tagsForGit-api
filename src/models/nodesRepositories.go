@@ -1,16 +1,16 @@
 package models
 
 type Node struct {
-	ID          string `json:"id_project"`
-	Description string `json:"description"`
+	ID          string `bson:"id" json:"id_project"`
+	Description string `bson:"description" json:"description"`
 	Languages   struct {
 		Edges []struct {
 			Node struct {
-				Name string `json:"name"`
-			} `json:"node"`
-		} `json:"edges"`
-	} `json:"languages"`
-	Name        string `json:"name"`
-	ProjectsURL string `json:"projectsUrl"`
-	Tags        []Tags `json:"tags"`
+				Name string `bson:"name" json:"name"`
+			} `bson:"node" json:"node"`
+		} `bson:"edges" json:"edges"`
+	} `bson:"languages" json:"languages"`
+	Name        string `bson:"name" json:"name"`
+	ProjectsURL string `bson:"projectsUrl" json:"projectsUrl"`
+	Tags        []Tag  `bson:"tags" json:"tags"`
 }

@@ -27,26 +27,32 @@ func (m *TagsDAO) Connect() {
 	db = session.DB(m.Database)
 }
 
-func (m *TagsDAO) GetAllTags() ([]models.GitRepositories, error) {
-	var tags []models.GitRepositories
+func (m *TagsDAO) GetAllTags() ([]models.User, error) {
+	var tags []models.User
 	err := db.C(COLLECTION).Find(bson.M{}).All(&tags)
 	// err := db.C(COLLECTION).Find(bson.M{}).All(&tags)
 	return tags, err
 }
 
-func (m *TagsDAO) GetTagsByUser(login string) (models.GitRepositories, error) {
-	var tags models.Tags
-	err := db.C(COLLECTION).FindId(bson.M{"user.login": login}).One(&tags)
-	return tags, err
+func (m *TagsDAO) GetTagsByUser(login string) (models.User, error) {
+	var Tags models.User
+	// err := db.C(COLLECTION).Find(bson.D{}).One(Tags)
+	err := db.C(COLLECTION).Find(bson.D{{"user.login", login}}).One(&Tags)
+	return Tags, err
 }
 
-func (m *TagsDAO) GetTagsByID(id string) (models.Tags, error) {
-	var tags models.Tags
+func (m *TagsDAO) GetTagsByID(id string) (models.Tag, error) {
+	var tags models.Tag
 	err := db.C(COLLECTION).FindId(bson.ObjectIdHex(id)).One(&tags)
 	return tags, err
 }
 
 func (m *TagsDAO) CreateTags(tags interface{}) error {
 	err := db.C(COLLECTION).Insert(tags)
+	return err
+}
+func (m *TagsDAO) UpdateTags(login string, user models.User) error {
+	err := db.C(COLLECTION).Update(bson.D{{"user.login", login}}, &user)
+	// Id(bson.ObjectIdHex(id), &user)
 	return err
 }

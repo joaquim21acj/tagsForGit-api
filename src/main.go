@@ -8,6 +8,7 @@ import (
 	"tagsForGit-api/src/config/dao"
 	router "tagsForGit-api/src/router"
 
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
@@ -24,18 +25,16 @@ func init() {
 
 func main() {
 	r := mux.NewRouter()
-	// r.HandleFunc("/api/v1/movies", router.GetAll).Methods("GET")
-	// r.HandleFunc("/api/v1/movies/{id}", router.GetByID).Methods("GET")
-	// r.HandleFunc("/api/v1/movies", router.Create).Methods("POST")
-	// r.HandleFunc("/api/v1/movies/{id}", router.Update).Methods("PUT")
-	// r.HandleFunc("/api/v1/movies/{id}", router.Delete).Methods("DELETE")
+	headersOk := handlers.AllowedHeaders([]string{"Access-Control-Allow-Origin", "content-type"})
+	originsOk := handlers.AllowedOrigins([]string{"*"})
+	methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "PATCH", "OPTIONS"})
 
 	r.HandleFunc("/api/v1/tags", router.GetAllTags).Methods("GET")
-	r.HandleFunc("/api/v1/tags/{id}", router.GetTagByID).Methods("GET")
-	r.HandleFunc("/api/v1/tags", router.CreateTag).Methods("POST")
+	// r.HandleFunc("/api/v1/tags/{id}", router.GetTagByID).Methods("GET")
+	r.HandleFunc("/api/v1/tags", router.CreateTag).Methods("PATCH")
 	// Função apenas para testar dados do banco
 	r.HandleFunc("/api/v1/test", router.GetTagAllTest).Methods("GET")
 	var port = ":3000"
 	fmt.Println("Server running in port:", port)
-	log.Fatal(http.ListenAndServe(port, r))
+	log.Fatal(http.ListenAndServe(port, handlers.CORS(originsOk, headersOk, methodsOk)(r)))
 }

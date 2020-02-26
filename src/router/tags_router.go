@@ -7,10 +7,10 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 	"tagsForGit-api/src/config/dao"
 	"tagsForGit-api/src/models"
 
-	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 )
 
@@ -21,7 +21,7 @@ type graphResponse struct {
 }
 
 var urlGraphQL = "https://api.github.com/graphql"
-var token = "bb9051f211e5178b953fbf566274ba3b57afc142"
+var token = "daba0d333d063bbb02869d055daa2583024caf05"
 
 func respondWithError(w http.ResponseWriter, code int, msg string) {
 	respondWithJson(w, code, map[string]string{"error": msg})
@@ -95,41 +95,94 @@ func GetAllTags(w http.ResponseWriter, r *http.Request) {
 		log.Println(errors.Wrap(err, "decoding response"))
 	}
 
-	tag, err := daoTags.GetTagsByUser(userLogin[0])
-	if err {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-	if err := daoTags.CreateTags(gr.Data); err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-	respondWithJson(w, http.StatusCreated, gr.Data)
+	user, err := daoTags.GetTagsByUser(userLogin[0])
 
-}
-
-func GetTagByID(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	tag, err := daoTags.GetTagsByID(params["id"])
 	if err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid Movie ID")
+		if strings.Compare(err.Error(), "not found") == 0 {
+			if err := daoTags.CreateTags(gr.Data); err != nil {
+				respondWithError(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+			respondWithJson(w, http.StatusCreated, gr.Data)
+		} else {
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+		}
 		return
 	}
-	respondWithJson(w, http.StatusOK, tag)
+	respondWithJson(w, http.StatusOK, user)
+	return
 }
+
+// func GetTagByID(w http.ResponseWriter, r *http.Request) {
+// 	params := mux.Vars(r)
+// 	tag, err := daoTags.GetTagsByID(params["id"])
+// 	if err != nil {
+// 		respondWithError(w, http.StatusBadRequest, "Invalid Movie ID")
+// 		return
+// 	}
+// 	respondWithJson(w, http.StatusOK, tag)
+// }
 
 func CreateTag(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	var tags models.Tags
-	if err := json.NewDecoder(r.Body).Decode(&tags); err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
+	// Decodifica o objeto que vem no corpo do request e o transforma em tags
+	var repository models.Node
+
+	//Pega o resultado que vem no body e copia para o buffer
+	var buf bytes.Buffer
+	if _, err := io.Copy(&buf, r.Body); err != nil {
+		log.Println(errors.Wrap(err, "reading body"))
 		return
 	}
-	if err := daoTags.CreateTags(tags); err != nil {
+
+	//Transforma os dados de bytes, em buffer, para o formato da struct criada
+	if err := json.NewDecoder(&buf).Decode(&repository); err != nil {
+		log.Println(errors.Wrap(err, "decoding response"))
+	}
+
+	// if err := json.NewDecoder(r.Body).Decode(&repository); err != nil {
+	// 	respondWithError(w, http.StatusBadRequest, "Objeto inválido")
+	// 	return
+	// }
+	// Pega parametro userLogin da url
+	userLogin, ok := r.URL.Query()["userLogin"]
+	if !ok || len(userLogin[0]) < 1 {
+		log.Println("Url Param 'userLogin' is missing")
+		respondWithError(w, http.StatusBadRequest, "deu ruim")
+		return
+	}
+
+	user, err := daoTags.GetTagsByUser(userLogin[0])
+
+	if err != nil {
+		if strings.Compare(err.Error(), "not found") == 0 {
+			respondWithError(w, http.StatusNotFound, "User not found")
+		} else {
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+		}
+		return
+	}
+	var check int = 0
+	for i, s := range user.User.StarredRepositories.Edges {
+		if s.NodeRepositories.ID == repository.ID {
+			user.User.StarredRepositories.Edges[i].NodeRepositories = repository
+			check++
+		}
+	}
+	for _, s := range user.User.StarredRepositories.Edges {
+		println(s.NodeRepositories.Name)
+	}
+
+	if check == 0 {
+		respondWithError(w, http.StatusBadRequest, "Esse respositorio não faz parte dos itens curtidos")
+		return
+	}
+
+	if err := daoTags.UpdateTags(userLogin[0], user); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	respondWithJson(w, http.StatusCreated, tags)
+	respondWithJson(w, http.StatusCreated, "ok")
 }
 
 func getJson(r *http.Response, target interface{}) error {
