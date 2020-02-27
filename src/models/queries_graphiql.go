@@ -5,7 +5,7 @@ func GetRepositories(userLogin string) string {
 					user(login: "` + userLogin + `") {
 					id
 					login
-					starredRepositories(first: 10) {
+					starredRepositories(first: 100) {
 						edges {
 						node {
 							id
