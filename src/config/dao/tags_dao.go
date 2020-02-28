@@ -8,6 +8,8 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+// TagsDAO é uma struct para armazenar as configuracoes do servidor
+// e do database
 type TagsDAO struct {
 	Server   string
 	Database string
@@ -16,9 +18,11 @@ type TagsDAO struct {
 var db *mgo.Database
 
 const (
+	// COLLECTION usada na conexao
 	COLLECTION = "tags"
 )
 
+// Connect faz a conexão com o banco e não possui retorno
 func (m *TagsDAO) Connect() {
 	session, err := mgo.Dial(m.Server)
 	if err != nil {
@@ -27,16 +31,18 @@ func (m *TagsDAO) Connect() {
 	db = session.DB(m.Database)
 }
 
+// GetAllTags busca todos as tags que cada usuário possui
+// retorna as tags dos usuários e error se houver
 func (m *TagsDAO) GetAllTags() ([]models.User, error) {
 	var tags []models.User
 	err := db.C(COLLECTION).Find(bson.M{}).All(&tags)
-	// err := db.C(COLLECTION).Find(bson.M{}).All(&tags)
 	return tags, err
 }
 
+// GetTagsByUser realiza uma busca de todas as tags por um usuário
+// retorna as tags para o usuário e error se houver
 func (m *TagsDAO) GetTagsByUser(login string) (models.User, error) {
 	var Tags models.User
-	// err := db.C(COLLECTION).Find(bson.D{}).One(Tags)
 	err := db.C(COLLECTION).Find(bson.D{{"user.login", login}}).One(&Tags)
 	return Tags, err
 }
