@@ -21,7 +21,7 @@ type graphResponse struct {
 }
 
 var urlGraphQL = "https://api.github.com/graphql"
-var token = "daba0d333d063bbb02869d055daa2583024caf05"
+var token = "181dcdced15c557e90d2c9fcfe3e1665bb4da985"
 
 func respondWithError(w http.ResponseWriter, code int, msg string) {
 	respondWithJson(w, code, map[string]string{"error": msg})
