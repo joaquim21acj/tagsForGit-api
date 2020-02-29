@@ -1,5 +1,6 @@
 package models
 
+// GetRepositories recebe o login do usuário e retorna a query para o graphiql
 func GetRepositories(userLogin string) string {
 	var query = `	query {
 					user(login: "` + userLogin + `") {

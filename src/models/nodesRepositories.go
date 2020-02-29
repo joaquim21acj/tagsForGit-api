@@ -1,5 +1,6 @@
 package models
 
+// Node correspondente aos dados do repositorio
 type Node struct {
 	ID          string `bson:"id" json:"id_project"`
 	Description string `bson:"description" json:"description"`

@@ -2,6 +2,8 @@ package models
 
 import "gopkg.in/mgo.v2/bson"
 
+// User é o conjunto de dados que é recebida pela api do GitHubV4
+// o bson.ObjectId representa o id que é gerado no bando pelo Mongo
 type User struct {
 	ID   bson.ObjectId `bson:"_id" json:"id"`
 	User struct {

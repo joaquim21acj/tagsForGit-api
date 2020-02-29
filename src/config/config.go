@@ -12,6 +12,7 @@ type Config struct {
 	Database string
 }
 
+// Realiza a leitura do arquivo de configuração
 func (c *Config) Read() {
 	if _, err := toml.DecodeFile("config.toml", &c); err != nil {
 		log.Fatal(err)

@@ -47,18 +47,16 @@ func (m *TagsDAO) GetTagsByUser(login string) (models.User, error) {
 	return Tags, err
 }
 
-func (m *TagsDAO) GetTagsByID(id string) (models.Tag, error) {
-	var tags models.Tag
-	err := db.C(COLLECTION).FindId(bson.ObjectIdHex(id)).One(&tags)
-	return tags, err
-}
-
+// CreateTags recebe uma interface correspondente ao usuário com seus repositorios
+// retorna erro caso haja
 func (m *TagsDAO) CreateTags(tags interface{}) error {
 	err := db.C(COLLECTION).Insert(tags)
 	return err
 }
+
+// UpdateTags recebe o login do usuário e o objeto do usuário e o atualiza
+// retorna erro caso haja
 func (m *TagsDAO) UpdateTags(login string, user models.User) error {
 	err := db.C(COLLECTION).Update(bson.D{{"user.login", login}}, &user)
-	// Id(bson.ObjectIdHex(id), &user)
 	return err
 }
